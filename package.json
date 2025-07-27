@@ -1,0 +1,26 @@
+{
+  "name": "associate360-platform",
+  "version": "1.0.0",
+  "description": "Comprehensive Associate 360 and Asset Management platform for off-role employees under T&M agreement",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd frontend && ng serve",
+    "build": "cd frontend && ng build --prod",
+    "install-all": "npm install && cd server && npm install && cd ../frontend && npm install",
+    "start": "cd server && npm start"
+  },
+  "keywords": [
+    "angular",
+    "nodejs",
+    "asset-management",
+    "hr-platform",
+    "employee-management"
+  ],
+  "author": "Associate360 Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

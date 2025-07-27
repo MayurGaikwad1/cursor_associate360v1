@@ -1,0 +1,268 @@
+<!-- Main Application Layout -->
+<div class="app-container" [class.sidebar-collapsed]="sidebarCollapsed">
+  
+  <!-- Login Layout -->
+  <div *ngIf="!isLoggedIn" class="login-layout">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Main Application Layout -->
+  <div *ngIf="isLoggedIn" class="main-layout">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <button 
+          class="sidebar-toggle-btn"
+          (click)="toggleSidebar()"
+          mat-icon-button>
+          <mat-icon>menu</mat-icon>
+        </button>
+        <h1 class="app-title">{{ title }}</h1>
+      </div>
+      
+      <div class="header-right">
+        <!-- Notifications -->
+        <button mat-icon-button class="notification-btn">
+          <mat-icon [matBadge]="3" matBadgeColor="warn" matBadgeSize="small">notifications</mat-icon>
+        </button>
+        
+        <!-- User Profile -->
+        <div class="user-profile" [matMenuTriggerFor]="userMenu">
+          <div class="user-avatar">{{ userInitials }}</div>
+          <div class="user-info">
+            <span class="user-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</span>
+            <span class="user-role">{{ userRole }}</span>
+          </div>
+          <mat-icon>arrow_drop_down</mat-icon>
+        </div>
+        
+        <!-- User Menu -->
+        <mat-menu #userMenu="matMenu" class="user-menu">
+          <button mat-menu-item routerLink="/profile">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item routerLink="/settings">
+            <mat-icon>settings</mat-icon>
+            <span>Settings</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <nav class="app-sidebar" [class.collapsed]="sidebarCollapsed">
+      <div class="sidebar-content">
+        
+        <!-- Dashboard -->
+        <div class="nav-section">
+          <a routerLink="/dashboard" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>dashboard</mat-icon>
+            <span class="nav-text">Dashboard</span>
+          </a>
+        </div>
+
+        <!-- Job Management -->
+        <div class="nav-section" *ngIf="hasPermission('canCreateJobs') || hasPermission('canApproveJobs')">
+          <div class="nav-section-title">Job Management</div>
+          
+          <a routerLink="/jobs/create" 
+             routerLinkActive="active" 
+             class="nav-item"
+             *ngIf="hasPermission('canCreateJobs')">
+            <mat-icon>add_circle</mat-icon>
+            <span class="nav-text">Create Job</span>
+          </a>
+          
+          <a routerLink="/jobs/list" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>work</mat-icon>
+            <span class="nav-text">Job Listings</span>
+          </a>
+          
+          <a routerLink="/jobs/approval" 
+             routerLinkActive="active" 
+             class="nav-item"
+             *ngIf="hasPermission('canApproveJobs')">
+            <mat-icon>approval</mat-icon>
+            <span class="nav-text">Job Approvals</span>
+          </a>
+        </div>
+
+        <!-- Procurement -->
+        <div class="nav-section" *ngIf="hasPermission('canAccessProcurement')">
+          <div class="nav-section-title">Procurement</div>
+          
+          <a routerLink="/procurement/inbox" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>inbox</mat-icon>
+            <span class="nav-text">Procurement Inbox</span>
+          </a>
+          
+          <a routerLink="/procurement/candidates" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>people</mat-icon>
+            <span class="nav-text">Candidate Management</span>
+          </a>
+        </div>
+
+        <!-- Associate Management -->
+        <div class="nav-section">
+          <div class="nav-section-title">Associates</div>
+          
+          <a routerLink="/associates/list" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>group</mat-icon>
+            <span class="nav-text">Associate List</span>
+          </a>
+          
+          <a routerLink="/associates/onboarding" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>person_add</mat-icon>
+            <span class="nav-text">Onboarding</span>
+          </a>
+          
+          <a routerLink="/associates/attendance" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>schedule</mat-icon>
+            <span class="nav-text">Attendance</span>
+          </a>
+          
+          <a routerLink="/associates/leave" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>event_busy</mat-icon>
+            <span class="nav-text">Leave Management</span>
+          </a>
+        </div>
+
+        <!-- Asset Management -->
+        <div class="nav-section" *ngIf="hasPermission('canManageAssets')">
+          <div class="nav-section-title">Asset Management</div>
+          
+          <a routerLink="/assets/list" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>devices</mat-icon>
+            <span class="nav-text">Asset Inventory</span>
+          </a>
+          
+          <a routerLink="/assets/assignments" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>assignment</mat-icon>
+            <span class="nav-text">Asset Assignments</span>
+          </a>
+          
+          <a routerLink="/assets/maintenance" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>build</mat-icon>
+            <span class="nav-text">Maintenance</span>
+          </a>
+        </div>
+
+        <!-- Clearance Management -->
+        <div class="nav-section" *ngIf="hasPermission('canProcessClearance')">
+          <div class="nav-section-title">Clearance</div>
+          
+          <a routerLink="/clearance/list" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>check_circle</mat-icon>
+            <span class="nav-text">Clearance Records</span>
+          </a>
+          
+          <a routerLink="/clearance/bulk" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>upload_file</mat-icon>
+            <span class="nav-text">Bulk Clearance</span>
+          </a>
+        </div>
+
+        <!-- Reports -->
+        <div class="nav-section" *ngIf="hasPermission('canViewReports')">
+          <div class="nav-section-title">Reports</div>
+          
+          <a routerLink="/reports/dashboard" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>analytics</mat-icon>
+            <span class="nav-text">Analytics</span>
+          </a>
+          
+          <a routerLink="/reports/cost-analysis" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>attach_money</mat-icon>
+            <span class="nav-text">Cost Analysis</span>
+          </a>
+          
+          <a routerLink="/reports/asset-utilization" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>trending_up</mat-icon>
+            <span class="nav-text">Asset Utilization</span>
+          </a>
+        </div>
+
+        <!-- Administration -->
+        <div class="nav-section" *ngIf="hasPermission('canManageUsers')">
+          <div class="nav-section-title">Administration</div>
+          
+          <a routerLink="/admin/users" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>admin_panel_settings</mat-icon>
+            <span class="nav-text">User Management</span>
+          </a>
+          
+          <a routerLink="/admin/system" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>settings_applications</mat-icon>
+            <span class="nav-text">System Settings</span>
+          </a>
+          
+          <a routerLink="/admin/audit" 
+             routerLinkActive="active" 
+             class="nav-item">
+            <mat-icon>history</mat-icon>
+            <span class="nav-text">Audit Logs</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="app-content">
+      <div class="content-wrapper">
+        <!-- Loading Indicator -->
+        <ngx-loading></ngx-loading>
+        
+        <!-- Page Content -->
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container">
+  <!-- Toastr notifications will appear here -->
+</div>
